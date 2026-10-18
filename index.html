@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Andy Huber | Personal Website</title>
-  <meta name="description" content="Andy Huber's biography, networking resume, and hands-on Cisco home lab projects, including routing, switching, HSRP, and an Ubuntu NTP server.">
+  <meta name="description" content="Andy Huber’s website: a bit about me, my résumé, and notes from my Cisco home lab as I study for the CCNA.">
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H0VT97FYN4"></script>
@@ -176,10 +176,10 @@
     <header>
       <p class="location">MESA, ARIZONA</p>
       <h1>Andy Huber</h1>
-      <p class="subtitle">Biography &middot; R&eacute;sum&eacute; &middot; Projects</p>
+      <p class="subtitle">Biography · Résumé · Projects</p>
       <nav aria-label="Main navigation">
         <a href="#about">About me</a>
-        <a href="#resume">R&eacute;sum&eacute;</a>
+        <a href="#resume">Résumé</a>
         <a href="#projects">Projects</a>
         <a href="lab-journal.html">Lab Journal</a>
         <a href="#contact">Contact</a>
@@ -189,135 +189,51 @@
     <main>
       <section id="about" aria-labelledby="about-heading">
         <h2 id="about-heading">About Me</h2>
-        <p>I’m Andy Huber, based in Mesa, Arizona. I have a bachelor’s degree in mathematics and a background in financial operations, where my work involves investigating discrepancies, tracing problems to their source, and helping teams resolve them.</p>
-        <p>I’m working toward a career in network engineering. I’m studying for the CCNA and building practical skills in a physical Cisco home lab, including routing, switching, VLANs, and troubleshooting. This website is where I share my projects and what I’m learning along the way.</p>
-        <p>Outside of work and studying, I enjoy spending time with my family and watching Survivor.</p>
+        <p>I’m Andy. I live in Mesa, Arizona, and I have a degree in mathematics. I work in financial operations, where I spend a lot of time tracking down discrepancies and figuring out where things went wrong.</p>
+        <p>I’m studying for the CCNA and working toward a move into networking. I use a physical Cisco lab at home to try things out and see how they work. I’m keeping notes here as I go.</p>
+        <p>Outside of work and studying, I spend time with my family and watch Survivor.</p>
       </section>
 
       <section id="resume" aria-labelledby="resume-heading">
-        <h2 id="resume-heading">R&eacute;sum&eacute;</h2>
-        <p>My background combines regulated financial operations with hands-on Cisco networking lab experience.</p>
+        <h2 id="resume-heading">Résumé</h2>
+        <p>My résumé covers my work in financial operations and what I’ve been learning in my home lab.</p>
         <div class="actions">
-          <a class="button primary" href="resume.pdf" target="_blank" rel="noopener" data-resume-action="view">View my r&eacute;sum&eacute; (PDF)</a>
-          <a class="button secondary" href="resume.pdf" download="Andy-Huber-Resume.pdf" data-resume-action="download">Download my r&eacute;sum&eacute;</a>
+          <a class="button primary" href="resume.pdf" target="_blank" rel="noopener" data-resume-action="view">View my résumé (PDF)</a>
+          <a class="button secondary" href="resume.pdf" download="Andy-Huber-Resume.pdf" data-resume-action="download">Download my résumé</a>
         </div>
       </section>
 
       <section id="projects" aria-labelledby="projects-heading">
         <h2 id="projects-heading">Projects</h2>
-        <p><a href="lab-journal.html#stp-lacp-2026-10-17">Read my current lab journal: Spanning Tree and LACP</a></p>
+        <p>I’m writing up the lab work in my <a href="lab-journal.html">lab journal</a>. There are notes on <a href="lab-journal.html#ntp-2026-10-12">setting up NTP</a> and <a href="lab-journal.html#stp-lacp-2026-10-17">working through spanning tree and LACP</a>.</p>
 
         <article class="lab-project">
-          <h3>Cisco Home Network Lab</h3>
-          <p>I built a physical Cisco lab to develop hands-on skills in routing, switching, and troubleshooting. It includes Cisco 1921 and 2821 routers and 2960X, 2960, and 3560 switches.</p>
+          <h3>My Cisco home lab</h3>
+          <p>I’ve put together a lab with Cisco 1921 and 2821 routers and 2960X, 2960, and 3560 switches. This is where I practice the networking topics I’m studying for the CCNA.</p>
           <ul class="project-list">
-            <li>VLANs, 802.1Q trunks, and inter-VLAN routing.</li>
-            <li>LACP EtherChannels and spanning-tree configuration.</li>
-            <li>OSPF routing neighbors and HSRP active/standby gateways.</li>
-            <li>Configuration verification and connectivity troubleshooting with Cisco IOS commands.</li>
+            <li>VLANs, trunks, and routing between VLANs.</li>
+            <li>LACP EtherChannels and spanning tree.</li>
+            <li>OSPF neighbors and HSRP gateways.</li>
+            <li>Checking configurations and tracking down connectivity problems.</li>
           </ul>
           <figure>
             <a class="diagram-link" href="lab-diagram.png" target="_blank" rel="noopener">
               <img class="diagram" src="lab-diagram.png" alt="Cisco home lab diagram showing two routers, three switches, VLANs, LACP links, OSPF, and HSRP gateways" width="2400" height="2220" loading="lazy">
             </a>
-            <figcaption>Logical lab overview. Select the diagram to open the full-size image.</figcaption>
+            <figcaption>Here’s the layout. Open the diagram for a larger version.</figcaption>
           </figure>
         </article>
 
-        <article class="lab-project" id="ntp-project">
-          <h3>Ubuntu NTP Server</h3>
-          <p>I configured chrony on Ubuntu to provide a shared time source for my Cisco home lab. I verified upstream synchronization and checked incoming NTP requests from lab devices. The goal is consistent timestamps for troubleshooting.</p>
-          <ul class="tags" aria-label="NTP project technologies">
-            <li>Ubuntu</li><li>chrony</li><li>NTP</li><li>Verification</li>
-          </ul>
-          <dl class="results">
-            <div><dt>Reported stratum</dt><dd>3</dd></div>
-            <div><dt>Lab client addresses</dt><dd>6</dd></div>
-            <div><dt>Reported NTP drops</dt><dd>0</dd></div>
-          </dl>
-          <p class="finding"><strong>Verified result:</strong> Ubuntu reported normal synchronization and selected <code>91.189.91.113</code> as its upstream source. Six lab addresses had sent NTP requests, with zero drops reported in the client table.</p>
-          <p class="snapshot">Verification snapshot: October 12, 2026 (Arizona time). These are saved lab results.</p>
-          <details class="evidence">
-            <summary>View clock synchronization output</summary>
-            <pre tabindex="0" aria-label="chronyc tracking output"><code>$ chronyc -n tracking
-Reference ID    : 5BBD5B71 (91.189.91.113)
-Stratum         : 3
-Ref time (UTC)  : Tue Oct 13 02:58:14 2026
-System time     : 0.000894409 seconds fast of NTP time
-Last offset     : +0.000041409 seconds
-RMS offset      : 0.000325139 seconds
-Frequency       : 19.658 ppm fast
-Residual freq   : +0.001 ppm
-Skew            : 0.133 ppm
-Root delay      : 0.127366856 seconds
-Root dispersion : 0.003854245 seconds
-Update interval : 1025.3 seconds
-Leap status     : Normal</code></pre>
-          </details>
-          <details class="evidence">
-            <summary>View upstream time sources</summary>
-            <pre tabindex="0" aria-label="chronyc sources output"><code>$ chronyc -n sources -v
-
-  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
- / .- Source state '*' = current best, '+' = combined, '-' = not combined,
-| /             'x' = may be in error, '~' = too variable, '?' = unusable.
-||                                                 .- xxxx [ yyyy ] +/- zzzz
-||      Reachability register (octal) -.           |  xxxx = adjusted offset,
-||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
-||                                \     |          |  zzzz = estimated error.
-||                                 |    |           \
-MS Name/IP address         Stratum Poll Reach LastRx Last sample
-===============================================================================
-^+ 185.125.190.122               2  10   377   664   +782us[ +782us] +/-   79ms
-^+ 185.125.190.123               2  10   377   823    +74us[ +116us] +/-   75ms
-^+ 91.189.91.112                 2  10   377   797   -445us[ -445us] +/-   64ms
-^* 91.189.91.113                 2  10   377   811   +460us[ +501us] +/-   67ms
-^- 185.125.190.121               2  10   377   849  +2173us[+2214us] +/-   75ms</code></pre>
-          </details>
-          <details class="evidence">
-            <summary>View NTP client requests</summary>
-            <pre tabindex="0" aria-label="chronyc clients output"><code>$ sudo chronyc -n clients
-Hostname                      NTP   Drop Int IntL Last     Cmd   Drop Int  Last
-===============================================================================
-10.31.31.31                   172      0   6   -    57       0      0   -     -
-10.31.62.3                    176      0   6   -    32       0      0   -     -
-10.31.31.62                   170      0   6   -     9       0      0   -     -
-10.31.62.2                    174      0   6   -    40       0      0   -     -
-10.31.62.7                    175      0   6   -    62       0      0   -     -
-10.31.31.93                   127      0   6   -     0       0      0   -     -
-127.0.0.1                       0      0   -   -     -       7      0   2     5</code></pre>
-          </details>
-          <p class="note" style="margin-top:14px;">The client table confirms incoming requests. Synchronization of each Cisco device is checked separately on that device.</p>
-        </article>
-
-        <article class="lab-project" id="gateway-project">
-          <h3>Verifying an HSRP Gateway from Ubuntu</h3>
-          <p>I used route and neighbor-table output to identify Ubuntu’s next hop for another VLAN and verify the MAC address associated with the HSRP virtual gateway.</p>
-          <ul class="tags" aria-label="Gateway project technologies">
-            <li>HSRP</li><li>Routing</li><li>ARP</li><li>Troubleshooting</li>
-          </ul>
-          <p class="finding"><strong>Verified result:</strong> Ubuntu selected <code>10.31.62.1</code> for traffic to <code>10.31.93.100</code>. Its neighbor table mapped that gateway to <code>00:00:0c:07:ac:3e</code>, the HSRP version 1 virtual MAC for group 62, with the neighbor marked <code>REACHABLE</code>.</p>
-          <p class="snapshot">Verification snapshot: October 12, 2026 (Arizona time). This example checks the host’s route selection and gateway neighbor entry.</p>
-          <details class="evidence">
-            <summary>View gateway verification output</summary>
-            <pre tabindex="0" aria-label="Ubuntu route and neighbor verification output"><code>$ ip route get 10.31.93.100
-10.31.93.100 via 10.31.62.1 dev enp1s0 src 10.31.62.62 uid 1000
-    cache
-
-$ ip neigh show 10.31.62.1
-10.31.62.1 dev enp1s0 lladdr 00:00:0c:07:ac:3e REACHABLE</code></pre>
-          </details>
-        </article>
-      </section>
+        </section>
 
       <section id="contact" aria-labelledby="contact-heading">
         <h2 id="contact-heading">Contact</h2>
         <p><a href="mailto:andyhuber31@gmail.com">andyhuber31@gmail.com</a></p>
-        <p><a href="https://www.linkedin.com/in/andyhuber31" target="_blank" rel="noopener">Connect with me on LinkedIn</a></p>
+        <p><a href="https://www.linkedin.com/in/andyhuber31" target="_blank" rel="noopener">Find me on LinkedIn</a></p>
       </section>
     </main>
 
-    <footer>Andy Huber &middot; Mesa, Arizona</footer>
+    <footer>Andy Huber · Mesa, Arizona</footer>
   </div>
 
   <!-- Track the two resume links separately in Google Analytics. -->

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CCNA Lab Journal | Andy Huber</title>
-  <meta name="description" content="Andy Huber's hands-on CCNA lab journal: predictions, Cisco command output, verified findings, and current work on spanning tree, LACP, and VLAN 310.">
+  <title>Lab Journal | Andy Huber</title>
+  <meta name="description" content="Notes from Andy Huber’s Cisco home lab, including an Ubuntu NTP setup and work on spanning tree, LACP, and VLAN 310.">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H0VT97FYN4"></script>
   <script>
@@ -192,49 +192,52 @@
   <div class="page">
     <header>
       <p class="location">ANDY HUBER · CISCO HOME LAB</p>
-      <h1>CCNA Lab Journal</h1>
-      <p class="subtitle">What I’m testing, what I predicted, and what the output shows.</p>
+      <h1>My CCNA lab notes</h1>
+      <p class="subtitle">Things I’m trying in my home lab while I study for the CCNA.</p>
       <nav aria-label="Main navigation">
         <a href="index.html#about">About me</a>
-        <a href="index.html#resume">R&eacute;sum&eacute;</a>
+        <a href="index.html#resume">Résumé</a>
         <a href="index.html#projects">Projects</a>
         <a href="lab-journal.html" aria-current="page">Lab Journal</a>
         <a href="index.html#contact">Contact</a>
       </nav>
     </header>
     <main>
-      <a class="back-link" href="index.html">&larr; Back to my portfolio</a>
+      <a class="back-link" href="index.html">← Back to my portfolio</a>
 
       <section aria-labelledby="journal-about">
-        <h2 id="journal-about">Learning through the lab</h2>
-        <p>I’m studying for the CCNA using physical Cisco routers and switches. This journal records the questions I’m testing, the evidence I collect, and what I learn along the way.</p>
-        <p>I keep completed observations alongside the next checks so it’s clear where each exercise stands.</p>
-        <p><a href="#stp-lacp-2026-10-17">Latest entry: Spanning Tree and LACP</a></p>
+        <h2 id="journal-about">What I’m working on</h2>
+        <p>I’m using my home lab to study for the CCNA. These are notes from things I’ve tried, along with the commands I used to check them.</p>
+        <p>I’m writing this down so I can come back later and remember what I did and why.</p>
+        <ul class="project-list">
+          <li><a href="#stp-lacp-2026-10-17">October 17: Spanning tree and LACP</a> — still working on this.</li>
+          <li><a href="#ntp-2026-10-12">October 12: Setting up NTP on Ubuntu</a>.</li>
+        </ul>
       </section>
 
       <section id="stp-lacp-2026-10-17" aria-labelledby="entry-title">
         <div class="entry-meta">
           <time datetime="2026-10-17">October 17, 2026</time>
-          <span class="badge">In progress</span>
+          <span class="badge">Work in progress</span>
         </div>
-        <h2 id="entry-title">Spanning Tree and LACP: Building a Redundant Switching Lab</h2>
-        <p>I started by recording the existing links, EtherChannels, and spanning-tree roles on Paul, Ringo, and George. My next stage is to extend VLAN 310 across the switches and then add a direct Paul–George link so I can compare spanning tree before and after a redundant path exists.</p>
+        <h2 id="entry-title">Working through spanning tree and LACP</h2>
+        <p>I’m working through spanning tree using Paul, Ringo, and George. I started by checking the links and port roles before adding another connection between the switches. This entry covers that starting point.</p>
         <ul class="tags" aria-label="Lab technologies">
           <li>CCNA</li><li>STP</li><li>LACP</li><li>802.1Q</li><li>VLAN 310</li>
         </ul>
 
         <div class="journal-section">
-          <h3>Goal</h3>
-          <p>Use command output to explain root-bridge selection and port roles, and observe how spanning tree handles a redundant switch path alongside LACP EtherChannels.</p>
-          <p class="finding"><strong>Current stage:</strong> The initial switching baseline is captured. VLAN 310 checks and the direct Paul–George link are still part of the work in progress.</p>
+          <h3>What I wanted to check</h3>
+          <p>I want to understand why a switch becomes the root and why each port ends up with its role. I’m also looking at how STP handles a port-channel made up of several cables.</p>
+          <p class="finding">The bigger exercise uses VLAN 310 and a direct Paul–George link. I’m keeping the starting output here so I can compare it with the next stage.</p>
         </div>
 
         <div class="journal-section">
-          <h3>Starting topology</h3>
-          <p>The baseline has two switch-to-switch connections. Each is an eight-member LACP EtherChannel. The direct Paul–George link is planned for the next stage.</p>
+          <h3>The setup</h3>
+          <p>I started with Paul connected to Ringo through Po2, and Ringo connected to George through Po1. Each port-channel has eight physical links. At this point there was no direct Paul–George connection.</p>
           <div class="table-wrap" tabindex="0" aria-label="Switch connection table; scroll horizontally on small screens">
             <table>
-              <caption class="note" style="text-align:left;padding:10px 13px;">Connections in the October 17 baseline</caption>
+              <caption class="note" style="text-align:left;padding:10px 13px;">Switch links at the start of the lab</caption>
               <thead><tr><th scope="col">Connection</th><th scope="col">Logical interface</th><th scope="col">Members</th><th scope="col">Status</th></tr></thead>
               <tbody>
                 <tr><th scope="row">Paul ↔ Ringo</th><td>Po2 on both switches</td><td>8 physical links</td><td>Layer 2, in use</td></tr>
@@ -243,15 +246,15 @@
               </tbody>
             </table>
           </div>
-          <p class="note">Other router and endpoint connections are outside the scope of this switching comparison.</p>
+          <p class="note">This table covers the links between the three switches.</p>
         </div>
 
         <div class="journal-section">
-          <h3>My prediction</h3>
-          <blockquote>I expect spanning tree to treat each LACP EtherChannel as one logical port, even though the channel contains eight physical interfaces.</blockquote>
-          <p>The baseline supports this: Paul’s EtherChannel output lists eight bundled members in Po2, while its spanning-tree output lists Po2 as a single root port.</p>
+          <h3>What I expected</h3>
+          <blockquote>I expected STP to see each EtherChannel as one link, even though there are eight cables in it.</blockquote>
+          <p>That matches what I saw on Paul. The EtherChannel output lists all eight members, and the spanning-tree output shows Po2 as one root port.</p>
           <details class="evidence">
-            <summary>Inspect Paul’s eight-member EtherChannel</summary>
+            <summary>Paul’s EtherChannel output</summary>
             <pre tabindex="0" aria-label="Paul EtherChannel summary excerpt"><code>Paul-2960X-U05#show etherchannel summ
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended
@@ -277,11 +280,11 @@ Group  Port-channel  Protocol    Ports
         </div>
 
         <div class="journal-section">
-          <h3>What I verified in the baseline</h3>
-          <p>For VLAN 31, all three outputs identify George’s bridge address, <code>0008.30d2.1100</code>, as the root. The displayed root priority is <code>32799</code>, which includes base priority 32768 and VLAN ID 31.</p>
+          <h3>What the switches showed</h3>
+          <p>George was the root for VLAN 31. All three switches pointed to its address, <code>0008.30d2.1100</code>. The priority shown was <code>32799</code>: the base priority of 32768 plus VLAN 31.</p>
           <div class="table-wrap" tabindex="0" aria-label="VLAN 31 spanning-tree baseline table; scroll horizontally on small screens">
             <table>
-              <caption class="note" style="text-align:left;padding:10px 13px;">Verified VLAN 31 state</caption>
+              <caption class="note" style="text-align:left;padding:10px 13px;">VLAN 31 at the start of the lab</caption>
               <thead><tr><th scope="col">Switch</th><th scope="col">STP mode</th><th scope="col">Role / root port</th><th scope="col">Reported root path cost</th></tr></thead>
               <tbody>
                 <tr><th scope="row">George · 2960</th><td>PVST+</td><td>Root bridge</td><td>Root itself</td></tr>
@@ -290,9 +293,9 @@ Group  Port-channel  Protocol    Ports
               </tbody>
             </table>
           </div>
-          <p>Ringo’s Po2 is designated and forwarding for VLAN 31. There is no blocked switch-to-switch path in this baseline; the direct Paul–George link has not yet been added.</p>
+          <p>On Ringo, Po1 was the root port and Po2 was designated. Both were forwarding. There wasn’t a blocked switch-to-switch path in this starting setup.</p>
           <details class="evidence">
-            <summary>Inspect George’s root-bridge output</summary>
+            <summary>George’s spanning-tree output</summary>
             <pre tabindex="0" aria-label="George VLAN 31 spanning-tree output"><code>George-2960-U06#show span vlan 31
 
 VLAN0031
@@ -313,7 +316,7 @@ Fa0/1               Desg FWD 19        128.1    P2p
 Po1                 Desg FWD 5         128.56   P2p</code></pre>
           </details>
           <details class="evidence">
-            <summary>Inspect Ringo’s root and designated ports</summary>
+            <summary>Ringo’s spanning-tree output</summary>
             <pre tabindex="0" aria-label="Ringo VLAN 31 spanning-tree output"><code>Ringo-3560-U07#show span vlan 31
 
 VLAN0031
@@ -335,7 +338,7 @@ Po1                 Root FWD 5         128.56   P2p Peer(STP)
 Po2                 Desg FWD 5         128.64   P2p Peer(STP)</code></pre>
           </details>
           <details class="evidence">
-            <summary>Inspect Paul’s root port and path cost</summary>
+            <summary>Paul’s spanning-tree output</summary>
             <pre tabindex="0" aria-label="Paul VLAN 31 spanning-tree output"><code>Paul-2960X-U05#show spanning-tree vlan 31
 
 VLAN0031
@@ -356,38 +359,104 @@ Interface           Role Sts Cost      Prio.Nbr Type
 Gi1/0/1             Desg FWD 4         128.1    P2p
 Po2                 Root FWD 5         128.464  P2p</code></pre>
           </details>
-          <p class="note" style="margin-top:14px;">CLI excerpts are from my October 17 baseline. Login banners, unrelated commands, and repeated prompts are omitted.</p>
+          <p class="note" style="margin-top:14px;">These are excerpts from October 17. I’ve left out login banners and repeated commands.</p>
         </div>
 
         <div class="journal-section">
-          <h3>What this tells me</h3>
+          <h3>A few things I’m learning</h3>
           <ul class="project-list">
-            <li><strong>Use the bridge IDs to explain root selection.</strong> The switch with the lowest bridge ID wins for a VLAN; priority is compared before the MAC address. Configuration order is not the election rule.</li>
-            <li><strong>Keep physical members and logical paths separate.</strong> Eight bundled interfaces appear as one port-channel in spanning tree. The member count alone does not prove a redundant switch path exists.</li>
-            <li><strong>Distinguish bundling from traffic distribution.</strong> The output confirms eight active members, not equal use of all eight. EtherChannel uses a hash to select a member; I have not measured traffic distribution in this exercise.</li>
+            <li>I need to compare the whole bridge ID when figuring out the root. Priority comes first, then the MAC address if the priorities match. It isn’t based on which switch was configured first.</li>
+            <li>Eight cables in an EtherChannel still show up as one logical port in STP. That’s different from having a separate path through another switch.</li>
+            <li>The eight members are bundled, but I haven’t measured how traffic is spread across them. The switch uses a hash to choose a member, so I’m not assuming they all carry equal traffic.</li>
           </ul>
         </div>
 
         <div class="journal-section">
-          <h3>What I’m checking next</h3>
+          <h3>What I want to add next</h3>
           <ol class="status-list">
-            <li><strong>VLAN 310:</strong> confirm the VLAN exists on each switch, check the trunk lists, and capture its spanning-tree root and port roles.</li>
-            <li><strong>Before the new link:</strong> record my prediction for the root, root ports, and which path spanning tree will keep out of forwarding.</li>
-            <li><strong>After adding Paul–George:</strong> collect the same outputs again and explain the observed changes.</li>
+            <li>The VLAN 310 output from each switch, including its root and port roles.</li>
+            <li>My prediction before adding the Paul–George link.</li>
+            <li>The output afterward, with an explanation of what changed.</li>
           </ol>
-          <p class="note" style="margin-top:16px;">The VLAN 31 baseline above is verified. VLAN 310 root selection and the triangle test are not yet recorded as completed results.</p>
+          <p class="note" style="margin-top:16px;">For now, this entry has the VLAN 31 starting point. I’ll add the later stages with their own output.</p>
         </div>
       </section>
 
-      <section aria-labelledby="references-heading">
-        <h2 id="references-heading">Technical references</h2>
+      <section id="ntp-2026-10-12" aria-labelledby="ntp-entry-title">
+        <div class="entry-meta">
+          <time datetime="2026-10-12">October 12, 2026</time>
+          <span class="badge">NTP setup</span>
+        </div>
+        <h2 id="ntp-entry-title">Setting up NTP on Ubuntu</h2>
+        <p>I set up chrony on my Ubuntu node so the Cisco devices in my lab could use it as a time server. I wanted their clocks using the same time source so it would be easier to compare log entries when troubleshooting.</p>
+        <p>I checked that Ubuntu was getting time from its upstream servers, then looked at the client list to see whether the lab devices were sending it NTP requests.</p>
+        <h3>What I saw</h3>
+        <ul class="project-list">
+          <li>Ubuntu reported stratum 3 and a normal leap status.</li>
+          <li>It had selected <code>91.189.91.113</code> as its upstream time source.</li>
+          <li>Six lab addresses were sending NTP requests. The client table showed zero dropped NTP requests for those addresses.</li>
+        </ul>
+        <p>The client list shows that requests reached Ubuntu. Checking each Cisco device’s NTP status is a separate step.</p>
+        <p class="snapshot">Saved output from October 12, Arizona time. The reference timestamp below is in UTC, where it was already October 13.</p>
+      <details class="evidence">
+            <summary>Checking Ubuntu’s clock</summary>
+            <pre tabindex="0" aria-label="chronyc tracking output"><code>$ chronyc -n tracking
+Reference ID    : 5BBD5B71 (91.189.91.113)
+Stratum         : 3
+Ref time (UTC)  : Tue Oct 13 02:58:14 2026
+System time     : 0.000894409 seconds fast of NTP time
+Last offset     : +0.000041409 seconds
+RMS offset      : 0.000325139 seconds
+Frequency       : 19.658 ppm fast
+Residual freq   : +0.001 ppm
+Skew            : 0.133 ppm
+Root delay      : 0.127366856 seconds
+Root dispersion : 0.003854245 seconds
+Update interval : 1025.3 seconds
+Leap status     : Normal</code></pre>
+          </details>
+          <details class="evidence">
+            <summary>The upstream time sources</summary>
+            <pre tabindex="0" aria-label="chronyc sources output"><code>$ chronyc -n sources -v
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current best, '+' = combined, '-' = not combined,
+| /             'x' = may be in error, '~' = too variable, '?' = unusable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample
+===============================================================================
+^+ 185.125.190.122               2  10   377   664   +782us[ +782us] +/-   79ms
+^+ 185.125.190.123               2  10   377   823    +74us[ +116us] +/-   75ms
+^+ 91.189.91.112                 2  10   377   797   -445us[ -445us] +/-   64ms
+^* 91.189.91.113                 2  10   377   811   +460us[ +501us] +/-   67ms
+^- 185.125.190.121               2  10   377   849  +2173us[+2214us] +/-   75ms</code></pre>
+          </details>
+          <details class="evidence">
+            <summary>Requests from the lab devices</summary>
+            <pre tabindex="0" aria-label="chronyc clients output"><code>$ sudo chronyc -n clients
+Hostname                      NTP   Drop Int IntL Last     Cmd   Drop Int  Last
+===============================================================================
+10.31.31.31                   172      0   6   -    57       0      0   -     -
+10.31.62.3                    176      0   6   -    32       0      0   -     -
+10.31.31.62                   170      0   6   -     9       0      0   -     -
+10.31.62.2                    174      0   6   -    40       0      0   -     -
+10.31.62.7                    175      0   6   -    62       0      0   -     -
+10.31.31.93                   127      0   6   -     0       0      0   -     -
+127.0.0.1                       0      0   -   -     -       7      0   2     5</code></pre>
+          </details>
+          </section><section aria-labelledby="references-heading">
+        <h2 id="references-heading">Related reading</h2>
         <ul class="reference-list">
           <li><a href="https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst2960/software/release/12-2_55_se/configuration/guide/scg_2960/swstp.html" target="_blank" rel="noopener">Cisco Catalyst 2960: Configuring STP</a></li>
           <li><a href="https://www.cisco.com/c/en/us/support/docs/lan-switching/etherchannel/12023-4.html" target="_blank" rel="noopener">Cisco: EtherChannel Load Balance and Redundancy</a></li>
         </ul>
       </section>
     </main>
-    <footer>Andy Huber &middot; <a href="index.html">Portfolio</a> &middot; <a href="mailto:andyhuber31@gmail.com">Contact</a></footer>
+    <footer>Andy Huber · <a href="index.html">Portfolio</a> · <a href="mailto:andyhuber31@gmail.com">Contact</a></footer>
   </div>
   <!-- Cloudflare Web Analytics -->
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"07d99b23a81049009a8aa54aee724ecf"}'></script>
