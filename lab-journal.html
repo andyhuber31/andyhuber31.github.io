@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lab Journal | Andy Huber</title>
-  <meta name="description" content="Notes from Andy Huber’s Cisco home lab, including an Ubuntu NTP setup and work on spanning tree, LACP, and VLAN 310.">
+  <meta name="description" content="Notes from Andy Huber’s Cisco home lab: spanning tree, Loop Guard, Root Guard, LACP, and an Ubuntu NTP server.">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H0VT97FYN4"></script>
   <script>
@@ -210,9 +210,253 @@
         <p>I’m using my home lab to study for the CCNA. These are notes from things I’ve tried, along with the commands I used to check them.</p>
         <p>I’m writing this down so I can come back later and remember what I did and why.</p>
         <ul class="project-list">
+          <li><a href="#stp-guards-2026-10-20">October 20: Watching spanning tree happen</a> — port states, Loop Guard, and Root Guard.</li>
           <li><a href="#stp-lacp-2026-10-17">October 17: Spanning tree and LACP</a> — still working on this.</li>
           <li><a href="#ntp-2026-10-12">October 12: Setting up NTP on Ubuntu</a>.</li>
         </ul>
+      </section>
+
+      <section id="stp-guards-2026-10-20" aria-labelledby="stp-guards-title">
+        <div class="entry-meta">
+          <time datetime="2026-10-20">October 20, 2026</time>
+          <span class="badge">STP lab</span>
+        </div>
+        <h2 id="stp-guards-title">Watching spanning tree happen</h2>
+        <p>I watched George go through listening, learning, and forwarding, then compared what happened with the spanning-tree guards enabled and disabled. Seeing the actual machine follow the steps I’d read about was very cool.</p>
+        <ul class="tags" aria-label="Lab technologies">
+          <li>CCNA</li><li>STP</li><li>VLAN 310</li><li>Loop Guard</li><li>Root Guard</li>
+        </ul>
+
+        <div class="journal-section">
+          <h3>Watching the port change states</h3>
+          <p>I left George with one port carrying VLAN 310 and watched Fa0/2 go through <code>Root LIS</code>, <code>Root LRN</code>, and <code>Root FWD</code>. The role stayed root while the state changed from listening to learning to forwarding.</p>
+          <p>In these captures, Fa0/2 is George’s path toward Paul, the root bridge at <code>0038.dff1.f380</code>. The root path cost is 19.</p>
+          <details class="evidence">
+            <summary>Fa0/2 as the root port — listening (LIS)</summary>
+            <pre tabindex="0" aria-label="Fa0/2 as the root port — listening (LIS)"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        19
+             Port        2 (FastEthernet0/2)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  15  sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Root LIS 19        128.2    P2p</code></pre>
+          </details>
+          <details class="evidence">
+            <summary>Fa0/2 as the root port — learning (LRN)</summary>
+            <pre tabindex="0" aria-label="Fa0/2 as the root port — learning (LRN)"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        19
+             Port        2 (FastEthernet0/2)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  15  sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Root LRN 19        128.2    P2p</code></pre>
+          </details>
+          <details class="evidence">
+            <summary>Fa0/2 as the root port — forwarding (FWD)</summary>
+            <pre tabindex="0" aria-label="Fa0/2 as the root port — forwarding (FWD)"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        19
+             Port        2 (FastEthernet0/2)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  15  sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Root FWD 19        128.2    P2p</code></pre>
+          </details>
+        </div>
+
+        <div class="journal-section">
+          <h3>The Loop Guard test</h3>
+          <p>For this test, Po1 was still George’s root port. I enabled BPDU filtering on the root bridge and checked what happened with Loop Guard enabled on Fa0/2.</p>
+          <p>Fa0/2 showed <code>*LOOP_Inc</code> and stayed blocked. The inconsistent-port command also listed it as <code>Loop Inconsistent</code>.</p>
+          <details class="evidence">
+            <summary>Loop Guard enabled — LOOP_Inc and Loop Inconsistent</summary>
+            <pre tabindex="0" aria-label="Loop Guard enabled — LOOP_Inc and Loop Inconsistent"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        10
+             Port        56 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Desg BKN*19        128.2    P2p *LOOP_Inc
+Po1                 Root FWD 5         128.56   P2p
+
+George-2960-U06#show spanning-tree inc
+
+Name                 Interface                Inconsistency
+-------------------- ------------------------ ------------------
+VLAN0310             FastEthernet0/2          Loop Inconsistent
+
+Number of inconsistent ports (segments) in the system : 1</code></pre>
+          </details>
+        </div>
+
+        <div class="journal-section">
+          <h3>Taking Loop Guard off</h3>
+          <p>I removed Loop Guard but kept BPDU filtering on. Before making the change, I predicted that Fa0/2 would move to forwarding. It did.</p>
+          <p>The snapshots caught it as alternate/blocking, then designated/listening, and finally designated/forwarding. Po1 stayed root/forwarding throughout these captures.</p>
+          <div class="table-wrap" tabindex="0" aria-label="Port roles after removing Loop Guard; scroll horizontally on small screens">
+            <table>
+              <caption class="note" style="text-align:left;padding:10px 13px;">The sequence I captured with BPDU filtering still enabled</caption>
+              <thead><tr><th scope="col">Snapshot</th><th scope="col">Fa0/2</th><th scope="col">Po1</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">First</th><td>Alternate · blocking</td><td>Root · forwarding</td></tr>
+                <tr><th scope="row">Next</th><td>Designated · listening</td><td>Root · forwarding</td></tr>
+                <tr><th scope="row">Last</th><td>Designated · forwarding</td><td>Root · forwarding</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <details class="evidence">
+            <summary>After removing Loop Guard — alternate/blocking</summary>
+            <pre tabindex="0" aria-label="After removing Loop Guard — alternate/blocking"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        10
+             Port        56 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Altn BLK 19        128.2    P2p
+Po1                 Root FWD 5         128.56   P2p</code></pre>
+          </details>
+          <details class="evidence">
+            <summary>After removing Loop Guard — designated/listening</summary>
+            <pre tabindex="0" aria-label="After removing Loop Guard — designated/listening"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        10
+             Port        56 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Desg LIS 19        128.2    P2p
+Po1                 Root FWD 5         128.56   P2p</code></pre>
+          </details>
+          <details class="evidence">
+            <summary>After removing Loop Guard — designated/forwarding</summary>
+            <pre tabindex="0" aria-label="After removing Loop Guard — designated/forwarding"><code>George-2960-U06#show span vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        10
+             Port        56 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  15  sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Desg FWD 19        128.2    P2p
+Po1                 Root FWD 5         128.56   P2p</code></pre>
+          </details>
+          <p class="finding">This comparison helped Loop Guard make more sense to me. I could see the port stay blocked with it enabled, then reach forwarding after I removed it.</p>
+        </div>
+
+        <div class="journal-section">
+          <h3>Trying Root Guard</h3>
+          <p>I also saw <code>*ROOT_Inc</code> after enabling Root Guard on Fa0/2. Enabling it was the only change I made for that test. The inconsistent-port command listed Fa0/2 as <code>Root Inconsistent</code>, while Po1 was still root/forwarding.</p>
+          <details class="evidence">
+            <summary>Root Guard enabled — ROOT_Inc and Root Inconsistent</summary>
+            <pre tabindex="0" aria-label="Root Guard enabled — ROOT_Inc and Root Inconsistent"><code>George-2960-U06#show spanning-tree vlan 310
+
+VLAN0310
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24886
+             Address     0038.dff1.f380
+             Cost        10
+             Port        56 (Port-channel1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    33078  (priority 32768 sys-id-ext 310)
+             Address     0008.30d2.1100
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface           Role Sts Cost      Prio.Nbr Type
+------------------- ---- --- --------- -------- --------------------------------
+Fa0/2               Desg BKN*19        128.2    P2p *ROOT_Inc
+Po1                 Root FWD 5         128.56   P2p
+
+George-2960-U06#show spanning-tree inc
+
+Name                 Interface                Inconsistency
+-------------------- ------------------------ ------------------
+VLAN0310             FastEthernet0/2          Root Inconsistent
+
+Number of inconsistent ports (segments) in the system : 1</code></pre>
+          </details>
+          <p style="margin-top:16px;">I’m still working on understanding where I would use Root Guard, but seeing it happen gives me something concrete to connect to the explanation.</p>
+        </div>
+
+        <div class="journal-section">
+          <h3>What stuck with me</h3>
+          <p>Changing a setting and watching the result was more useful than just memorizing what the feature does. The best part was making a prediction and seeing the switch do what I expected.</p>
+          <p class="note">These are captures from separate parts of the lab. Po1 was still the root port during the guard tests; Fa0/2 was the root port in the one-port test. I’ve left out command help and repeated learning-state output.</p>
+        </div>
       </section>
 
       <section id="stp-lacp-2026-10-17" aria-labelledby="entry-title">
@@ -378,7 +622,7 @@ Po2                 Root FWD 5         128.464  P2p</code></pre>
             <li>My prediction before adding the Paul–George link.</li>
             <li>The output afterward, with an explanation of what changed.</li>
           </ol>
-          <p class="note" style="margin-top:16px;">For now, this entry has the VLAN 31 starting point. I’ll add the later stages with their own output.</p>
+          <p class="note" style="margin-top:16px;">This entry records the VLAN 31 starting point. My <a href="#stp-guards-2026-10-20">October 20 notes</a> cover the later VLAN 310 port-state and guard tests.</p>
         </div>
       </section>
 
@@ -453,6 +697,8 @@ Hostname                      NTP   Drop Int IntL Last     Cmd   Drop Int  Last
         <ul class="reference-list">
           <li><a href="https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst2960/software/release/12-2_55_se/configuration/guide/scg_2960/swstp.html" target="_blank" rel="noopener">Cisco Catalyst 2960: Configuring STP</a></li>
           <li><a href="https://www.cisco.com/c/en/us/support/docs/lan-switching/etherchannel/12023-4.html" target="_blank" rel="noopener">Cisco: EtherChannel Load Balance and Redundancy</a></li>
+          <li><a href="https://www.cisco.com/c/en/us/support/docs/lan-switching/spanning-tree-protocol-stp-8021d/218321-configure-stp-with-loop-guard-and-bpdu-s.html" target="_blank" rel="noopener">Cisco: STP Loop Guard and UDLD</a></li>
+          <li><a href="https://www.cisco.com/c/en/us/support/docs/lan-switching/spanning-tree-protocol/10588-74.html" target="_blank" rel="noopener">Cisco: STP Root Guard</a></li>
         </ul>
       </section>
     </main>
