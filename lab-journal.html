@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lab Journal | Andy Huber</title>
-  <meta name="description" content="Notes from Andy Huber’s Cisco home lab: spanning tree, Loop Guard, Root Guard, LACP, and an Ubuntu NTP server.">
+  <meta name="description" content="Notes from Andy Huber’s Cisco home lab: SSH troubleshooting and return routes, spanning tree, Loop Guard, Root Guard, LACP, and an Ubuntu NTP server.">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H0VT97FYN4"></script>
   <script>
@@ -210,10 +210,72 @@
         <p>I’m using my home lab to study for the CCNA. These are notes from things I’ve tried, along with the commands I used to check them.</p>
         <p>I’m writing this down so I can come back later and remember what I did and why.</p>
         <ul class="project-list">
+          <li><a href="#ssh-return-route-2026-10-27">October 27: SSH troubleshooting — check the return route</a>.</li>
           <li><a href="#stp-guards-2026-10-20">October 20: Watching spanning tree happen</a> — port states, Loop Guard, and Root Guard.</li>
           <li><a href="#stp-lacp-2026-10-17">October 17: Spanning tree and LACP</a> — still working on this.</li>
           <li><a href="#ntp-2026-10-12">October 12: Setting up NTP on Ubuntu</a>.</li>
         </ul>
+      </section>
+
+      <section id="ssh-return-route-2026-10-27" aria-labelledby="ssh-return-route-title">
+        <div class="entry-meta">
+          <time datetime="2026-10-27">October 27, 2026</time>
+          <span class="badge">SSH troubleshooting</span>
+        </div>
+        <h2 id="ssh-return-route-title">An SSH Troubleshooting Lesson: Check the Return Route</h2>
+        <p>While rebuilding my Cisco home lab for CCNA practice, I overlooked the default route on two devices and ran into the same remote-access problem.</p>
+        <p>My SSH connection would wait without reaching a login prompt. I initially focused on the SSH configuration: the local account, RSA keys, SSH version, and VTY lines.</p>
+        <p>Those settings looked correct. The management interfaces were also up/up.</p>
+        <p>The missing piece appeared in the routing table.</p>
+        <ul class="tags" aria-label="Lab technologies">
+          <li>CCNA</li><li>SSH</li><li>Routing</li><li>Cisco IOS</li>
+        </ul>
+
+        <div class="journal-section">
+          <h3>What I checked</h3>
+          <p>These commands helped narrow down the problem:</p>
+          <details class="evidence">
+            <summary>The troubleshooting commands</summary>
+            <pre tabindex="0" aria-label="Cisco IOS commands used to check SSH, interfaces, and routing"><code>show ip ssh
+show ip interface brief
+show ip route</code></pre>
+          </details>
+          <p style="margin-top:16px;">SSH was enabled, and the intended IP addresses were assigned to active interfaces. However, the routing table showed:</p>
+          <details class="evidence">
+            <summary>The routing-table clue</summary>
+            <pre tabindex="0" aria-label="Routing-table excerpt showing no gateway of last resort"><code>Gateway of last resort is not set</code></pre>
+          </details>
+          <p style="margin-top:16px;">My home computer was on a different subnet. Neither device had a specific route or a default route covering that destination, so it lacked a path for sending replies back.</p>
+        </div>
+
+        <div class="journal-section">
+          <h3>The correction</h3>
+          <p>On John, my Cisco 1921 router, the next hop was the upstream Omada gateway:</p>
+          <details class="evidence">
+            <summary>John — default route through the Omada gateway</summary>
+            <pre tabindex="0" aria-label="Default-route configuration command for John"><code>ip route 0.0.0.0 0.0.0.0 192.168.31.1</code></pre>
+          </details>
+          <p style="margin-top:16px;">On Ringo, my Cisco 3560 operating as a Layer 3 switch, the next hop was Billy’s management interface:</p>
+          <details class="evidence">
+            <summary>Ringo — default route through Billy</summary>
+            <pre tabindex="0" aria-label="Default-route configuration command for Ringo"><code>ip route 0.0.0.0 0.0.0.0 10.31.31.3</code></pre>
+          </details>
+          <p style="margin-top:16px;">The commands followed the same pattern, but the next-hop address depended on each device’s position in the network.</p>
+          <p>A default route suited this lab topology. A specific route to my home subnet could also have provided the return path.</p>
+        </div>
+
+        <div class="journal-section">
+          <h3>What I’m taking forward</h3>
+          <p>My remote-access checks now include:</p>
+          <ol class="status-list">
+            <li>Verify the management IP address and interface state.</li>
+            <li>Check the VLAN and trunk path.</li>
+            <li>Verify a route back to the connecting computer.</li>
+            <li>Check the SSH service and authentication settings.</li>
+            <li>Retest access and save the working configuration.</li>
+          </ol>
+          <p class="finding">The most useful lesson was understanding why the missing route mattered: even when a request reaches its destination, the destination still needs a way to reply.</p>
+        </div>
       </section>
 
       <section id="stp-guards-2026-10-20" aria-labelledby="stp-guards-title">
