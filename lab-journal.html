@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lab Journal | Andy Huber</title>
-  <meta name="description" content="Notes from Andy Huber’s home lab: Asterisk voice calls, Cisco routing, EtherChannels, spanning tree, remote access, and Linux practice.">
+  <meta name="description" content="Notes from Andy Huber’s home lab: Cisco routing, EtherChannels, spanning tree, remote access, and Linux practice.">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H0VT97FYN4"></script>
   <script>
@@ -217,7 +217,6 @@
         <a href="index.html#resume">Résumé</a>
         <a href="index.html#projects">Projects</a>
         <a href="home-lab.html">Home Lab</a>
-        <a href="asterisk-lab.html">Voice Lab</a>
         <a href="lab-journal.html" aria-current="page">Lab Journal</a>
         <a href="index.html#contact">Contact</a>
       </nav>
@@ -230,7 +229,6 @@
         <p>I earned my CCNA in November 2026. I’m continuing to use my home lab to practice and learn. These are notes from things I’ve tried, along with the commands I used to check them.</p>
         <p>I’m writing this down so I can come back later and remember what I did and why.</p>
         <ul class="project-list">
-          <li><a href="#voice-lab-2026-11-16">November 16: Asterisk, a desk phone, and a laptop softphone</a>.</li>
           <li><a href="#network-refresh-2026-11-16">November 16: Rebuilding uplinks and following the return path</a>.</li>
           <li><a href="#linux-practice-2026-11">November: Linux practice with Bandit</a>.</li>
           <li><a href="#ssh-return-route-2026-10-27">October 27: SSH troubleshooting — check the return route</a>.</li>
@@ -240,7 +238,6 @@
         </ul>
       </section>
 
-<section id="voice-lab-2026-11-16" aria-labelledby="voice-entry-title"><div class="entry-meta"><time datetime="2026-11-16">November 16, 2026</time><span class="badge">SIP and voice VLANs</span></div><h2 id="voice-entry-title">A desk phone, a laptop, and my own PBX</h2><p>I built Asterisk 22.12.0 from source on Debian 13, running at 10.31.62.124. My Yealink phone at 10.31.124.31 registered as 1001, and MicroSIP on my laptop registered as 1002.</p><p>The 600 echo test let me check audio with only one registered phone. I then connected calls in both directions and verified a call after rebooting the PBX VM. That checked more than whether the configuration files looked right: the service had to start, the phones had to register again, and a call had to connect.</p><div class="finding"><strong>Troubleshooting lesson:</strong> Ping to the phone worked while its HTTP page failed. Testing TCP ports 80 and 443 showed HTTPS was reachable. Opening the HTTPS URL got me into the phone settings.</div><p>The first laptop-to-phone attempt did not work. A retry while watching the Asterisk console succeeded; I have not identified the first attempt’s cause.</p><p><a href="asterisk-lab.html">Full project: configuration, verification commands, and call evidence</a></p></section>
 <section id="network-refresh-2026-11-16" aria-labelledby="network-entry-title"><div class="entry-meta"><time datetime="2026-11-16">November 16, 2026</time><span class="badge">Routing and LACP</span></div><h2 id="network-entry-title">Rebuilding uplinks and following the return path</h2><p>My expanded lab has three routers and four switches. I compared CDP neighbors with the configured channel groups and found links to different switches mixed into one bundle on Paul. Some other ports were standalone or suspended because the remote switch had no matching LACP configuration.</p><p>After separating the neighbors into their own bundles and configuring Ringo’s member ports, all five switch-to-switch EtherChannels showed four bundled members. Port-channel numbers are local: Paul’s Po2 connects successfully to Ringo’s Po1.</p><details class="evidence"><summary>Excerpt: Paul’s verified EtherChannels</summary><pre tabindex="0">1  Po1(SU)  LACP  Gi1/0/13(P) Gi1/0/14(P) Gi1/0/15(P) Gi1/0/16(P)
 2  Po2(SU)  LACP  Gi1/0/17(P) Gi1/0/18(P) Gi1/0/19(P) Gi1/0/20(P)</pre></details><h3 style="margin-top:24px">Other fixes</h3><ul class="project-list"><li>Changed the 1841 configuration register to 0x2102 and verified the change after reload.</li><li>Enabled routing on George and verified George and Ringo could reach John using their VLAN 31 source addresses.</li><li>Configured Billy’s default toward John, then found an ER605 rule preventing remote access from my laptop.</li><li>Corrected the 1841’s Ringo-facing address to 172.31.31.9/30 so it matches Ringo’s 172.31.31.10/30 subnet. This correction was reported; a post-change ping is still worth recording.</li><li>Used host-specific SSH client exceptions to reach the older 1841’s SSH implementation.</li></ul><p><strong>Still planned:</strong> OSPF, endpoint NTP, STP root/backup choices, and HSRP forwarding failover tests.</p><p><a href="home-lab.html">Current topology and addressing tables</a></p></section>
 <section id="linux-practice-2026-11" aria-labelledby="linux-entry-title"><div class="entry-meta"><span>November 2026</span><span class="badge">Ongoing practice</span></div><h2 id="linux-entry-title">Small command-line lessons from Bandit</h2><p>I’m using OverTheWire Bandit to get more comfortable inspecting files and combining commands. I’m documenting concepts rather than passwords or challenge solutions.</p><ul class="project-list"><li><code>./-</code> names a file called <code>-</code> in the current directory, avoiding its interpretation as standard input by tools such as <code>cat</code>.</li><li>Quote or escape spaces in filenames, for example <code>cat "file with spaces"</code>.</li><li>A pipe sends one command’s standard output to the next command’s standard input.</li><li>Use <code>find</code>, <code>grep</code>, <code>file</code>, and manual pages to identify what a file contains before choosing how to read it.</li><li>Repeatedly compressed data takes a sequence of format checks and extraction steps.</li></ul></section>
